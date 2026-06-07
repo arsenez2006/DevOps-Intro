@@ -67,3 +67,6 @@ Date:   Sun Jun 7 09:41:51 2026 +0300
 
 ### Signed commit explanation
 The March 2024 XZ Utils supply chain crisis highlighted that source code and release tarballs can be subtly manipulated when a project's maintainer account is compromised or taken over by a malicious actor (like "Jia Tan"). Signed commits matter because they use cryptographic verification to guarantee a commit genuinely originated from a trusted developer rather than an impersonator or a compromised account. By establishing a clear, unforgeable chain of custody, code signing ensures that unauthorized or highly suspicious changes can be immediately flagged before they are bundled into downstream software distributions.
+
+### GitHub Community
+Starring repositories acts as a vital discovery and validation mechanism in open source, helping projects gain visibility, signal reliability, and attract potential contributors. Meanwhile, following developers fosters professional growth and team alignment by keeping you updated on industry trends, innovative coding practices, and your peers' ongoing contributions.
