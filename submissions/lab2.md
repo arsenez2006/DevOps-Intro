@@ -132,3 +132,20 @@ $ ls .git/objects/ | head
 $ find .git/objects -type f | wc -l
 56
 ```
+
+### Recovery from `git reset`
+- Reflog output
+```sh
+$ git reflog
+ebd0570 (HEAD -> feature/lab2) HEAD@{0}: reset: moving to HEAD~2
+097e2b7 HEAD@{1}: commit: wip(lab2): more progress
+1083649 HEAD@{2}: commit: wip(lab2): start
+ebd0570 (HEAD -> feature/lab2) HEAD@{3}: commit: docs(lab2): git internals
+```
+- Restore
+```sh
+$ git reset --hard 097e2b7
+HEAD is now at 097e2b7 wip(lab2): more progress
+```
+
+If `git gc` (garbage collection) had run after a bad reset but before you could recover, it would have permanently deleted the orphaned commits from Git's internal database. Because a hard reset removes the branch pointer, those commits become unreachable, and `git gc` is designed to prune these unreferenced objects to optimize repository size. Once garbage collection purges them, the lost code can no longer be recovered using `git reflog`.
