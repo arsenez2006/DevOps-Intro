@@ -185,3 +185,37 @@ $ git log --oneline --graph
 ```
 
 The choice between merge and rebase comes down to whether you prioritize a perfectly accurate historical record or a clean, readable story. For public shared branches, use `git merge` instead of `git rebase` to prevent other contributors from manual reconciling of their local branches.
+
+### Bonus: bisection report
+Bisection log
+```
+git bisect start
+# status: waiting for both good and bad commits
+# good: [0ec87b808ae6a257a98ecea4a3c8d38a7f2c5ac7] chore(app): document versioning scheme (bisect fixture baseline)
+git bisect good 0ec87b808ae6a257a98ecea4a3c8d38a7f2c5ac7
+# status: waiting for bad commit, 1 good commit known
+# bad: [f0c9243b7c80ebb930a1ce7048a1d65b4c2ac493] docs(app): mention go test invocation
+git bisect bad f0c9243b7c80ebb930a1ce7048a1d65b4c2ac493
+# bad: [f285ede8611e55ac0a7d01100891c0cc775e0709] refactor(store): simplify nextID restoration in load()
+git bisect bad f285ede8611e55ac0a7d01100891c0cc775e0709
+# good: [cb89bb9ee2ee5010b166061447eaca3ae0da2378] docs(store): comment the load() decode step
+git bisect good cb89bb9ee2ee5010b166061447eaca3ae0da2378
+# first bad commit: [f285ede8611e55ac0a7d01100891c0cc775e0709] refactor(store): simplify nextID restoration in load()
+```
+
+Offending commit
+```
+f285ede8611e55ac0a7d01100891c0cc775e0709 is the first bad commit
+commit f285ede8611e55ac0a7d01100891c0cc775e0709
+Author: Dmitrii Creed <creeed22@gmail.com>
+Date:   Fri Jun 5 13:36:56 2026 +0400
+
+    refactor(store): simplify nextID restoration in load()
+    
+    Signed-off-by: Dmitrii Creed <creeed22@gmail.com>
+
+ app/store.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+
+`git bisect` utilizes a binary search algorithm to locate the exact commit that introduced a bug, splitting the remaining search space in half with each iteration. By checking the midpoint commit between the known "good" and "bad" boundaries, the tool eliminates 50% of the suspect commits based on whether that midpoint is tested as functional or broken. This exponential reduction means that for a history of $N$ commits, the number of required manual or automated test steps scales logarithmically as $\log_2(N)$. For example, finding a single malicious change or bug hidden among 1024 commits takes a maximum of only 10 evaluation steps.
