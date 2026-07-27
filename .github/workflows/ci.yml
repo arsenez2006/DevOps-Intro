@@ -1,0 +1,54 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - app/**
+      - .github/workflows/ci.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - app/**
+      - .github/workflows/ci.yml
+  workflow_dispatch:
+jobs:
+  test:
+    name: Run ${{ matrix.target }} for Go ${{ matrix.version }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['1.26']
+        target: ['test', 'vet', 'lint']
+        include:
+          - target: test
+            cmd: go test -race -count=1 ./...
+          - target: vet
+            cmd: go vet ./...
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with: 
+          go-version: ${{ matrix.version }}
+          cache: true
+          cache-dependency-path: app/go.mod
+
+      - name: Run golangci-lint
+        if: matrix.target == 'lint'
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: v2.12.2
+          working-directory: app
+
+      - name: Run ${{ matrix.target }}
+        if: matrix.target != 'lint'
+        run: |
+          cd app
+          ${{ matrix.cmd }}
